@@ -16,11 +16,8 @@ services:
     - ./data/mqtt:/var/lib/mosquitto
     - ./data/nodered:/data
     environment:
-    - MOSQUITTO_USER=${MOSQUITTO_USER}
-    - MOSQUITTO_PASSWORD=${MOSQUITTO_PASSWORD}
-    - MONGODB_USER=${MONGODB_USER}
-    - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-    - MONGODB_DATABASE=${MONGODB_DATABASE}
+    - MOSQUITTO_USER=${MQTT_USER}
+    - MOSQUITTO_PASSWORD=${MQTT_PASSWORD}
   nextdom-db:
     build:
       context: db
@@ -37,8 +34,8 @@ services:
     tmpfs:
     - /nextdomstate
     environment:
-    - MONGODB_USER=${MONGODB_USER}
-    - MONGODB_PASSWORD=${MONGODB_PASSWORD}
+    - DB_USER=${DB_USER}
+    - DB_PASSWORD=${DB_PASSWORD}
   nextdom-logic:
     build:
       context: logic
@@ -47,22 +44,18 @@ services:
     restart: always
     networks:
     - nextdom
-    environment:
-    - MOSQUITTO_USER=${MOSQUITTO_USER}
-    - MOSQUITTO_PASSWORD=${MOSQUITTO_PASSWORD}
-    - MONGODB_USER=${MONGODB_USER}
-    - MONGODB_PASSWORD=${MONGODB_PASSWORD}
-    - MONGODB_DATABASE=${MONGODB_DATABASE}
-#  nextdom-api:
-#    build:
-#      context: rest
-#    image: nextdom-api
-#    container_name: nextdom-api
-#    restart: always
-#    ports:
-#    - 3000:3000
-#    networks:
-#    - nextdom
+  nextdom-api:
+    build:
+      context: rest
+    image: nextdom-api
+    container_name: nextdom-api
+    restart: always
+    ports:
+    - 3000:3000
+    networks:
+    - nextdom
+    volumes:
+    - ~/.npm:/root/.npm
 #  adminer:
 #    image: adminer:latest
 #    restart: always

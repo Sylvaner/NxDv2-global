@@ -16,8 +16,8 @@ RUN echo "#!/bin/bash" > /entrypoint.sh && \
     echo "mongod --directoryperdb --dbpath /data/db &" >> /entrypoint.sh && \
     echo "MONGO_TEMP_PID=\$!" >> /entrypoint.sh && \ 
     echo "sleep 5" >> /entrypoint.sh && \
-    echo "mongo nextdom --eval \"db.createUser({user: '\"\${MONGODB_USER}\"', pwd: '\"\${MONGODB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
-    echo "mongo nextdomstate --eval \"db.createUser({user: '\"\${MONGODB_USER}\"', pwd: '\"\${MONGODB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
+    echo "mongo nextdom --eval \"db.createUser({user: '\"\${DB_USER}\"', pwd: '\"\${DB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
+    echo "mongo nextdomstate --eval \"db.createUser({user: '\"\${DB_USER}\"', pwd: '\"\${DB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
     echo "sleep 5" >> /entrypoint.sh && \
     echo "kill -s KILL \$MONGO_TEMP_PID" >> /entrypoint.sh && \
     echo "exec \$@" >> /entrypoint.sh && \
