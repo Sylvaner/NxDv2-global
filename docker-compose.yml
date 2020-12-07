@@ -30,7 +30,7 @@ services:
     networks:
     - nextdom
     volumes:
-    - ./data/db:/data/db/nextdom
+    - ./data/db:/data/db
     tmpfs:
     - /nextdomstate
     environment:
@@ -41,6 +41,9 @@ services:
       context: logic
     image: nextdom-logic
     container_name: nextdom-logic
+    depends_on:
+    - nextdom-v2
+    - nextdom-db
     restart: always
     networks:
     - nextdom
@@ -50,6 +53,8 @@ services:
     image: nextdom-api
     container_name: nextdom-api
     restart: always
+    depends_on:
+    - nextdom-db
     ports:
     - 3000:3000
     networks:

@@ -20,8 +20,12 @@ service mosquitto start
 ##########
 # NodeJS #
 ##########
-curl -sL https://deb.nodesource.com/setup_15.x | bash -
-apt-get install -y nodejs
+node -v > /dev/null
+if ! node -v &> /dev/null
+then
+  curl -sL https://deb.nodesource.com/setup_15.x | bash -
+  apt-get install -y nodejs
+fi
 
 ###########
 # NodeRed #
@@ -95,13 +99,13 @@ esac
 exit 0" > /etc/init.d/node-red
 chmod +x /etc/init.d/node-red
 service node-red start
-sleep 10
+sleep 20
 service node-red stop
 sed -i 's/\/\/credentialSecret/credentialSecret/g' /root/.node-red/settings.js
 CREDENTIAL_SECRET=$(tr -cd '[:alnum:]' < /dev/urandom | fold -w30 | head -n1)
 sed -i "s/a-secret-key/$CREDENTIAL_SECRET/g" /root/.node-red/settings.js
 service node-red start
-sleep 10
+sleep 20
 NODERED_REV=$(curl --silent -X GET -H "Node-RED-API-Version: v2" http://localhost:1880/flows | sed -rn 's/^.*"rev":"(.*)".*/\1/p')
 curl --silent -d '{
   "flows": [

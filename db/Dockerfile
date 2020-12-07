@@ -6,7 +6,6 @@ RUN wget -qO - https://www.mongodb.org/static/pgp/server-4.4.asc | apt-key add -
     ln -s /bin/true /bin/systemctl && \
     apt-get install -y mongodb-org && \
     mkdir -p /data/db
-RUN apt-get install -y procps
 RUN echo "#!/bin/bash" > /entrypoint.sh && \
     echo "sed -i 's#/var/lib/mongodb#/data/db#g' /etc/mongod.conf" >> /entrypoint.sh && \
     echo "sed -i 's#127.0.0.1#0.0.0.0#g' /etc/mongod.conf" >> /entrypoint.sh && \
@@ -15,10 +14,10 @@ RUN echo "#!/bin/bash" > /entrypoint.sh && \
     echo "ln -s /nextdomstate /data/db/nextdomstate" >> /entrypoint.sh && \
     echo "mongod --directoryperdb --dbpath /data/db &" >> /entrypoint.sh && \
     echo "MONGO_TEMP_PID=\$!" >> /entrypoint.sh && \ 
-    echo "sleep 5" >> /entrypoint.sh && \
+    echo "sleep 10" >> /entrypoint.sh && \
     echo "mongo nextdom --eval \"db.createUser({user: '\"\${DB_USER}\"', pwd: '\"\${DB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
     echo "mongo nextdomstate --eval \"db.createUser({user: '\"\${DB_USER}\"', pwd: '\"\${DB_PASSWORD}\"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})\"" >> /entrypoint.sh && \
-    echo "sleep 5" >> /entrypoint.sh && \
+    echo "sleep 10" >> /entrypoint.sh && \
     echo "kill -s KILL \$MONGO_TEMP_PID" >> /entrypoint.sh && \
     echo "exec \$@" >> /entrypoint.sh && \
     chmod +x /entrypoint.sh
