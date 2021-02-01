@@ -1,23 +1,6 @@
 version: '3'
 
 services:
-  nextdom-v2:
-    build:
-      context: install
-    image: nextdom-v2
-    container_name: nextdom-v2
-    restart: always
-    ports:
-    - 1880:1880/tcp
-    - 1883:1883/tcp
-    networks: 
-    - nextdom
-    volumes:
-    - ./data/mqtt:/var/lib/mosquitto
-    - ./data/nodered:/data
-    environment:
-    - MOSQUITTO_USER=${MQTT_USER}
-    - MOSQUITTO_PASSWORD=${MQTT_PASSWORD}
   nextdom-db:
     build:
       context: db
@@ -27,29 +10,56 @@ services:
     restart: always
     ports:
     - 27017:27017
-    networks:
-    - nextdom
     volumes:
-    - ./data/db:/data/db
+    - ${DATA_PATH}/data/db:/data/db
     tmpfs:
     - /nextdomstate
     environment:
     - DB_USER=${DB_USER}
     - DB_PASSWORD=${DB_PASSWORD}
+
+  nextdom-mqtt:
+    build:
+      context: mqtt
+    image: nextdom-mqtt
+    container_name: nextdom-mqtt
+    restart: always
+    ports:
+    - 1883:1883/tcp
+    volumes:
+    - ${DATA_PATH}/data/mqtt:/var/lib/mosquitto
+    environment:
+    - MQTT_USER=${MQTT_USER}
+    - MQTT_PASSWORD=${MQTT_PASSWORD}
+
+  nextdom-nodered:
+    build:
+      context: nodered
+    container_name: nextdom-nodered
+    restart: always
+    ports:
+    - 1880:1880/tcp
+    depends_on:
+    - nextdom-mqtt
+    volumes:
+    - ${DATA_PATH}/data/nodered:/root/.node-red
+    environment:
+    - MQTT_USER=${MQTT_USER}
+    - MQTT_PASSWORD=${MQTT_PASSWORD}
+
   nextdom-logic:
     build:
       context: logic
     image: nextdom-logic
     container_name: nextdom-logic
     depends_on:
-    - nextdom-v2
+    - nextdom-mqtt
     - nextdom-db
     restart: always
-    networks:
-    - nextdom
+
   nextdom-api:
     build:
-      context: rest
+      context: api
     image: nextdom-api
     container_name: nextdom-api
     restart: always
@@ -57,20 +67,10 @@ services:
     - nextdom-db
     ports:
     - 3000:3000
-    networks:
-    - nextdom
     volumes:
     - ~/.npm:/root/.npm
-#  adminer:
-#    image: adminer:latest
-#    restart: always
-#    networks:
-#    - nextdom
-#    ports: 
-#    - 9080:8080
-
 
 networks:
-  nextdom:
-    driver: bridge
-    name: nextdom
+  default:
+    external:
+      name: nextdom

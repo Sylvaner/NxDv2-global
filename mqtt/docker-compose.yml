@@ -1,0 +1,21 @@
+version: '3'
+
+services:
+  nextdom-mqtt:
+    build:
+      context: .
+    image: nextdom-mqtt
+    container_name: nextdom-mqtt
+    restart: always
+    ports:
+    - 1883:1883/tcp
+    volumes:
+    - ${DATA_PATH}/data/mqtt:/var/lib/mosquitto
+    environment:
+    - MQTT_USER=${MQTT_USER}
+    - MQTT_PASSWORD=${MQTT_PASSWORD}
+
+networks:
+  default:
+    external: 
+      name: nextdom

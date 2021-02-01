@@ -1,0 +1,20 @@
+version: '3'
+
+services:
+  nextdom-nodered:
+    build:
+      context: .
+    container_name: nextdom-nodered
+    restart: always
+    ports:
+    - 1880:1880/tcp
+    volumes:
+    - ${DATA_PATH}/data/nodered:/root/.node-red
+    environment:
+    - MQTT_USER=${MQTT_USER}
+    - MQTT_PASSWORD=${MQTT_PASSWORD}
+
+networks:
+  default:
+    external:
+      name: nextdom

@@ -1,0 +1,24 @@
+version: '3'
+
+services:
+  nextdom-db:
+    build:
+      context: .
+    image: nextdom-db
+    hostname: nextdom-db
+    container_name: nextdom-db
+    restart: always
+    ports:
+    - 27017:27017
+    volumes:
+    - ${DATA_PATH}/data/db:/data/db
+    tmpfs:
+    - /nextdomstate
+    environment:
+    - DB_USER=${DB_USER}
+    - DB_PASSWORD=${DB_PASSWORD}
+
+networks:
+  default:
+    external:
+      name: nextdom
