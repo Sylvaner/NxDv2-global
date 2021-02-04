@@ -6,6 +6,7 @@ if [ ! -e "/data/db/nextdomstate" ]; then
 	echo "  authorization: enabled" >> /etc/mongod.conf
 	### Utilisation d'un point de montage en mémoire pour les données volatiles
 	ln -s /nextdomstate /data/db/nextdomstate
+	chown -R mosquitto:mosquitto /var/lib/mosquitto
 	mongod --directoryperdb --dbpath /data/db &
 	### Lancement de la base pour exécuter les commandes de création des utilisateurs
 	MONGO_TEMP_PID=$!
