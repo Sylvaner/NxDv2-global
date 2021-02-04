@@ -8,6 +8,7 @@ RUN echo "#!/bin/sh" > /start.sh && \
     echo "service mosquitto start" >> /start.sh && \
     echo "touch /var/log/mosquitto/mosquitto.log" >> /start.sh && \
     echo "chown mosquitto:mosquitto /var/log/mosquitto/mosquitto.log" >> /start.sh && \
+    echo "chown mosquitto:mosquitto -R /var/lib/mosquitto" >> /start.sh && \
     echo "tail -f /var/log/mosquitto/mosquitto.log" >> /start.sh && \
     chmod +x start.sh && \
     apt-get clean autoclean && \

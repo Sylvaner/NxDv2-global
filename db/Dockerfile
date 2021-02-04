@@ -12,5 +12,5 @@ RUN ln -s /bin/true /bin/systemctl && \
     apt-get clean autoclean && \
     apt-get autoremove --yes && \
     rm -rf /var/lib/{apt,dpkg,cache,log}/
-ENTRYPOINT ["/entrypoint.sh"]
+ENTRYPOINT ["bash", "-x", "/entrypoint.sh"]
 CMD ["mongod", "--directoryperdb", "--auth", "-f", "/etc/mongod.conf"]
