@@ -35,6 +35,7 @@ services:
   nextdom-nodered:
     build:
       context: nodered
+    image: nextdom-nodered
     container_name: nextdom-nodered
     restart: always
     ports:

@@ -1,6 +1,18 @@
-#!/bin/sh
-git clone https://github.com/Sylvaner/NxDv2-logic logic
-git clone https://github.com/Sylvaner/NxDv2-api api
+#!/bin/bash
+if [[ -d logic ]]; then
+	cd logic
+	git pull
+	cd ..
+else
+	git clone https://github.com/Sylvaner/NxDv2-logic logic
+fi
+if [[ -d api ]]; then
+	cd api
+	git pull
+	cd ..
+else
+	git clone https://github.com/Sylvaner/NxDv2-api api
+fi
 cp -fr .env logic/.env
 cp -fr .env api/.env
 cp -fr .env db/.env

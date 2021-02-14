@@ -11,8 +11,10 @@ services:
     volumes:
     - ${DATA_PATH}/data/nodered:/root/.node-red
     environment:
+    - MQTT_HOST=${MQTT_HOST}
     - MQTT_USER=${MQTT_USER}
     - MQTT_PASSWORD=${MQTT_PASSWORD}
+    - MQTT_PORT=${MQTT_PORT}
 
 networks:
   default:

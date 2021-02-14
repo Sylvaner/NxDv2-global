@@ -19,8 +19,8 @@ if [ ! -e "/root/.node-red/settings.js" ]; then
       "id":"77777777.777777",
       "type":"mqtt-broker",
       "name":"NextDom Broker",
-      "broker":"localhost",
-      "port":"1883",
+      "broker":"'"${MQTT_HOST}"'",
+      "port":"'"${MQTT_PORT}"'",
       "clientid":
       "nextdom-nodered",
       "usetls":false,
@@ -37,8 +37,8 @@ if [ ! -e "/root/.node-red/settings.js" ]; then
       "willQos":"0",
       "willPayload":"",
       "credentials":{
-        "user":"'"${MOSQUITTO_USER}"'",
-        "password":"'"${MOSQUITTO_PASSWORD}"'"
+        "user":"'"${MQTT_USER}"'",
+        "password":"'"${MQTT_PASSWORD}"'"
       }
     }
   ],
