@@ -6,6 +6,9 @@ if [[ -d logic ]]; then
 else
 	git clone https://github.com/Sylvaner/NxDv2-logic logic
 fi
+cd logic
+npm install
+cd ..
 if [[ -d api ]]; then
 	cd api
 	git pull
@@ -13,13 +16,13 @@ if [[ -d api ]]; then
 else
 	git clone https://github.com/Sylvaner/NxDv2-api api
 fi
+cd api
+npm install
+cd ..
 cp -fr .env logic/.env
 cp -fr .env api/.env
 cp -fr .env db/.env
 cp -fr .env nodered/.env
 cp -fr .env mqtt/.env
 docker network create nextdom
-#docker-compose --file db/docker-compose.yml up -d --build
-#docker-compose --file nodered/docker-compose.yml up -d --build 
-#docker-compose --file mqtt/docker-compose.yml up -d --build 
 docker-compose up -d --build
