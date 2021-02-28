@@ -8,7 +8,7 @@ fi
 # Vérifie si l'utilisateur nextdom existe et le créé si nécessaire
 if ! id -u "nextdom" > /dev/null 2>&1; then
   echo ">>> Création de l'utilisateur nextdom"
-  adduser --system --no-create-home --group nextdom
+  adduser --system --group nextdom
 fi
 
 # Vérifie si le fichier de configuration existe et le créé si nécessaire

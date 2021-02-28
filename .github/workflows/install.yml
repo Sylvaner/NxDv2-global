@@ -2,13 +2,13 @@
 
 name: CI
 
-# Controls when the action will run. 
+# Controls when the action will run.
 on:
   # Triggers the workflow on push or pull request events but only for the main branch
   push:
-    branches: [ main ]
+    branches: [main]
   pull_request:
-    branches: [ main ]
+    branches: [main]
 
   # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
@@ -24,34 +24,68 @@ jobs:
     steps:
       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
       - uses: actions/checkout@v2
-      
+
       - name: Install MQTT
         run: |
           cd mqtt/debian
           sudo ./install.sh
-          ps -A | grep mosquitto
-      
+          systemctl status mosquitto
+
       - name: Install DB
         run: |
-          dpkg --list | grep mongo
           sudo apt-get purge mongodb-database-tools mongodb-org mongodb-org-database-tools-extra mongodb-org-mongos mongodb-org-server mongodb-org-shell mongodb-org-tools
           cd db/debian
           sudo ./install.sh
           ps -A | grep mongod
 
-      - name: Install Logic
+      - name: NodeRed
+        run: |
+          cd nodered/debian
+          sudo ./install.sh
+          systemctl status nextdom-nodered
+
+      - name: Logic
         run: |
           git clone https://github.com/Sylvaner/NxDv2-logic logic
           cd logic/debian
           ./build.sh
           sudo ./install.sh
           systemctl status nextdom-logic
+      
+      - name: Api
+        run: |
+          git clone https://github.com/Sylvaner/NxDv2-api api
+          cd api/debian
+          ./build.sh
+          sudo ./install.sh
+          journalctl -u nextdom-api
+          systemctl status nextdom-api
+
+      - name: Test process
+        run: |
+          apt-get install -y mosquitto-clients
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/$name' -m 'Lights'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/$properties' -m 'on,bri'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on/$name' -m 'On'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on/$datatype' -m 'boolean'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on/$settable' -m 'true'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/bri/$name' -m 'Brightness'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/bri/$datatype' -m 'integer'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/bri/$settable' -m 'true'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/bri/$format' -m '1:254'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$homie' -m '4.0'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$name' -m 'My light'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$state' -m 'ready'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$nodes' -m 'lights'
+          mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on' -m 'true'
+
 
       # Runs a single command using the runners shell
+
 #      - name: Run a one-line script
 #        run: echo Hello, world!
 
-      # Runs a set of commands using the runners shell
+# Runs a set of commands using the runners shell
 #      - name: Run a multi-line script
 #        run: |
 #          echo Add other actions to build,
