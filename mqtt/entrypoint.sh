@@ -2,7 +2,7 @@
 
 if [ ! -e "/etc/mosquitto/mosquitto.passwd" ]; then
 	MOSQUITTO_PASSWORD_FILE="/etc/mosquitto/mosquitto.passwd"
-	echo "user nextdom
+	echo "user $MQTT_USER
 topic readwrite #" > /etc/mosquitto/acl.conf
 	echo "password_file $MOSQUITTO_PASSWORD_FILE
 allow_anonymous false" > /etc/mosquitto/conf.d/security.conf
