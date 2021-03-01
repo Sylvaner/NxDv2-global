@@ -36,15 +36,15 @@ jobs:
           sudo apt-get purge mongodb-database-tools mongodb-org mongodb-org-database-tools-extra mongodb-org-mongos mongodb-org-server mongodb-org-shell mongodb-org-tools
           cd db/debian
           sudo ./install.sh
-          ps -A | grep mongod
+          systemctl status mongod
 
-      - name: NodeRed
+      - name: Install NodeRed
         run: |
           cd nodered/debian
           sudo ./install.sh
           systemctl status nextdom-nodered
 
-      - name: Logic
+      - name: Install Logic
         run: |
           git clone https://github.com/Sylvaner/NxDv2-logic logic
           cd logic/debian
@@ -52,18 +52,19 @@ jobs:
           sudo ./install.sh
           systemctl status nextdom-logic
       
-      - name: Api
+      - name: Install Api
         run: |
           git clone https://github.com/Sylvaner/NxDv2-api api
           cd api/debian
           ./build.sh
           sudo ./install.sh
-          journalctl -u nextdom-api
+          sleep 10
+          journalctl -u nextdom-api -n 100 --no-pager
           systemctl status nextdom-api
 
       - name: Test process
         run: |
-          apt-get install -y mosquitto-clients
+          sudo apt-get install -y mosquitto-clients 2>&1
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/$name' -m 'Lights'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/$properties' -m 'on,bri'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on/$name' -m 'On'
@@ -78,6 +79,8 @@ jobs:
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$state' -m 'ready'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$nodes' -m 'lights'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on' -m 'true'
+          curl -X GET "http://localhost:3000/device"
+
 
 
       # Runs a single command using the runners shell

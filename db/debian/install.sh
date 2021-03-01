@@ -48,20 +48,26 @@ if ! [ -x "$(command -v mongod)" ]; then
   echo ">>> Config mongodb"
   sed -i 's#/var/lib/mongodb#'$DB_PATH'#g' /etc/mongod.conf
   if ! grep -q "authorization: enabled" /etc/mongod.conf; then
-    echo "security:" >> /etc/mongod.conf
-    echo "  authorization: enabled" >> /etc/mongod.conf
+    sed -i 's/wiredTiger:$/wiredTiger:\n  directoryPerDB: true/g' /etc/mongod.conf
+    sed -i 's/log$/log\n  verbosity: 4/g' /etc/mongod.conf
   fi
   echo ">>> Init mongodb"
-  mongod --directoryperdb --dbpath $DB_PATH &
-  MONGO_TEMP_PID=$!
-  sleep 10
+  chown -R mongodb:mongodb $DB_PATH
+  # Premier lancement sans la sécurité
+  systemctl daemon-reload
+  systemctl enable mongod
+  systemctl start mongod
+  sleep 20
   echo ">>> Create user"
   mongo nextdom --eval "db.createUser({user: '"${DB_USER}"', pwd: '"${DB_PASSWORD}"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})"
   mongo nextdomstate --eval "db.createUser({user: '"${DB_USER}"', pwd: '"${DB_PASSWORD}"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})"
-  sleep 10
-  kill -s KILL $MONGO_TEMP_PID
-  systemctl daemon-reload
-  systemctl enable mongod
+  systemctl stop mongod
+  sleep 20
+  echo ">>> Secure MongoDB"
+  if ! grep -q "authorization: enabled" /etc/mongod.conf; then
+    echo "security:" >> /etc/mongod.conf
+    echo "  authorization: enabled" >> /etc/mongod.conf
+  fi
   systemctl start mongod
 else
   echo "Error: MongoDb is already installed"
