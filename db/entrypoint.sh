@@ -2,8 +2,6 @@
 if grep -q "127.0.0.1" "/etc/mongod.conf"; then
 	sed -i 's#/var/lib/mongodb#/data/db#g' /etc/mongod.conf
 	sed -i 's#127.0.0.1#0.0.0.0#g' /etc/mongod.conf
-	echo "security:" >> /etc/mongod.conf
-	echo "  authorization: enabled" >> /etc/mongod.conf
 	### Utilisation d'un point de montage en mémoire pour les données volatiles
 	ls -al /data/db
 	if [[ ! -f /data/db/nextdomstate ]]; then
@@ -19,6 +17,8 @@ if grep -q "127.0.0.1" "/etc/mongod.conf"; then
 		mongo nextdomstate --eval "db.createUser({user: '"${DB_USER}"', pwd: '"${DB_PASSWORD}"', roles: [ { role: 'clusterAdmin', db: 'admin' },{ role: 'readAnyDatabase', db: 'admin' },'readWrite']})"
 		sleep 10
 		kill -s KILL $MONGO_TEMP_PID
+		echo "security:" >> /etc/mongod.conf
+		echo "  authorization: enabled" >> /etc/mongod.conf
 	else
 		mongod --directoryperdb --dbpath /data/db --repair
 	fi

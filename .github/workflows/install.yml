@@ -79,7 +79,9 @@ jobs:
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$state' -m 'ready'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$nodes' -m 'lights'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on' -m 'true'
-          curl -X GET "http://localhost:3000/device"
+          sleep 15
+          DEVICES=$(curl -X GET "http://localhost:3000/device")
+          echo $DEVICES | grep 'homie/lights-2/lights/on'
 
 
 
