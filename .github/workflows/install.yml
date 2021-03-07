@@ -58,8 +58,6 @@ jobs:
           cd api/debian
           ./build.sh
           sudo ./install.sh
-          sleep 10
-          journalctl -u nextdom-api -n 100 --no-pager
           systemctl status nextdom-api
 
       - name: Test process
@@ -80,7 +78,7 @@ jobs:
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$nodes' -m 'lights'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on' -m 'true'
           sleep 15
-          DEVICES=$(curl -X GET "http://localhost:3000/device")
+          DEVICES=$(curl -X GET "http://localhost:3000/api/device")
           echo $DEVICES | grep 'homie/lights-2/lights/on'
 
 
