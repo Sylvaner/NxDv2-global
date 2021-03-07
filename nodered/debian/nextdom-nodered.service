@@ -10,7 +10,7 @@ User=nextdom
 Group=nextdom
 UMask=007
 NotifyAccess=main
-ExecStart=/usr/local/bin/node-red
+ExecStart=DAEMON_PATH
 Restart=on-failure
  
 # Configures the time to wait before service is stopped forcefully.

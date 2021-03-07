@@ -13,7 +13,7 @@
 set -e
 
 PIDFILE=/var/run/node-red.pid
-DAEMON=/usr/local/bin/node-red
+DAEMON=DAEMON_PATH
 OPTIONS=\"--max-old-space-size=128 --userDir=/root/.node-red\"
 test -x \${DAEMON} || exit 0
 

@@ -1,5 +1,6 @@
 #!/bin/sh
 
+apt-get install -y curl
 if [ $(id -u) != 0 ]; then 
   echo "Error: This script must be executed with privilegied user"
   exit 1
@@ -25,9 +26,14 @@ if ! [ -x "$(command -v node)" ]; then
   apt-get install -y nodejs
 fi
 
+echo ">>> Installing Node-RED"
+npm install -g --unsafe-perm node-red
+
+DAEMON_PATH=$(command -v node-red)
 if [ -x "$(command -v systemctl)" ]; then
   echo ">>> Create and enable service in SystemD"
   cp nextdom-nodered.service /etc/systemd/system/
+  sed -i "s#DAEMON_PATH#$DAEMON_PATH#g" /etc/systemd/system/nextdom-nodered.service
   systemctl daemon-reload
   systemctl enable nextdom-nodered
   NODE_RED_START="systemctl start nextdom-nodered"  
@@ -35,14 +41,12 @@ if [ -x "$(command -v systemctl)" ]; then
 else
   echo ">>> Create and enable service in init.d"
   cp -fr nextdom-nodered /etc/init.d/
+  sed -i "s#DAEMON_PATH#$DAEMON_PATH#g" /etc/init.d/nextdom-nodered
   update-rc.d nextdom-nodered defaults
   update-rc.d nextdom-nodered enable
   NODE_RED_START="service nextdom-nodered start"
   NODE_RED_STOP="service nextdom-nodered stop"
 fi
-
-echo ">>> Installing Node-REd"
-npm install -g --unsafe-perm node-red
 
 eval $NODE_RED_START
 echo ">>> Initialise config files"
