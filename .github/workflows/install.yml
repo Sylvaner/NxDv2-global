@@ -78,9 +78,21 @@ jobs:
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/$nodes' -m 'lights'
           mosquitto_pub -h localhost -u nextdom -P mqttpassword -t 'homie/lights-2/lights/on' -m 'true'
           sleep 15
-          DEVICES=$(curl -X GET "http://localhost:3000/api/device")
+          DEVICES=$(curl -X GET "http://localhost:3000/device")
           echo $DEVICES | grep 'homie/lights-2/lights/on'
 
+      - name: Logs on fail
+        if: ${{ failure() }}
+        run: |
+          sudo apt-get install -y net-tools
+          sudo tail -n 100 /var/log/mongodb/mongod.log
+          sudo tail -n 100 /var/log/mosquitto/mosquitto.log
+          sudo journalctl -n 100 -u nextdom-api
+          sudo journalctl -n 100 -u nextdom-logic
+          sudo journalctl -n 100 -u nextdom-noderedq
+          sudo netstat -putan
+          sudo ps -A
+          curl -X GET http://localhost:3000/device
 
 
       # Runs a single command using the runners shell

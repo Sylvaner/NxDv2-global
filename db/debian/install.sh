@@ -34,24 +34,10 @@ if ! [ -x "$(command -v mongod)" ]; then
   apt-get update 
   apt-get install -y mongodb-org 
 
-  # Vérifie si le répertoire contenant les états des périphériques existe déjà
-  if [ ! -f $DB_PATH/nextdomstate ]; then
-    echo ">>> Creating folders"
-    mkdir -p $DB_PATH/nextdomstate
-    mount -t tmpfs -o size=128M tmpfs $DB_PATH/nextdomstate
-  fi
-
-  # Ajoute dans fstab le répertoire en mémoire si il n'est pas déjà présent
-  if ! grep -q $DB_PATH/nextdomstate /etc/fstab; then
-    echo "tmpfs $DB_PATH/nextdomstate tmpfs defaults,size=128M 0 0" >> /etc/fstab
-  fi
   echo ">>> Config mongodb"
   sed -i 's#/var/lib/mongodb#'$DB_PATH'#g' /etc/mongod.conf
-  if ! grep -q "authorization: enabled" /etc/mongod.conf; then
-    sed -i 's/wiredTiger:$/wiredTiger:\n  directoryPerDB: true/g' /etc/mongod.conf
-    sed -i 's/log$/log\n  verbosity: 4/g' /etc/mongod.conf
-  fi
   echo ">>> Init mongodb"
+  mkdir -p $DB_PATH
   chown -R mongodb:mongodb $DB_PATH
   # Premier lancement sans la sécurité
   systemctl daemon-reload
